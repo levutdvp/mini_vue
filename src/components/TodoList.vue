@@ -25,8 +25,5 @@
       newTask.value = '';
     }
   };
-  const removeTask = () =>{
-
-  }
   </script>
   
