@@ -1,13 +1,12 @@
 
 <template>
   <div id="app">
-    <TodoList />
+    <Home />
   </div>
 </template>
 
 <script setup lang="ts">
-import TodoList from './components/TodoList.vue';
-  
+import Home from "./pages/Home.vue";
 </script>
 
 <style>
