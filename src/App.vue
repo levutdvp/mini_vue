@@ -1,22 +1,27 @@
 
 <template>
   <div id="app">
-    <Home />
+    <router-view/>
   </div>
 </template>
 
-<script setup lang="ts">
-import Home from "./pages/Home.vue";
+<script>
+import Login from './pages/Login.vue';
+import Home from './pages/Home.vue';
+export default {
+  name: "App",
+  components: {
+      Login,
+      Home
+  }
+};
 </script>
 
 <style>
 #app {
+  font-family: Avenir, Helvetica, Arial, sans-serif;
   text-align: center;
   color: #2c3e50;
   margin-top: 60px;
-}
-
-h2 {
-  color: #3498db;
 }
 </style>
