@@ -109,8 +109,9 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, reactive } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
 import type { ButtonInstance } from 'element-plus'
+import {apiUserInfo} from '../api/axios-instance'
 
 
 const dialogFormVisible = ref(false)
@@ -136,6 +137,19 @@ const item = {
   address: 'No. 189, Grove St, Los Angeles',
 }
 const tableData = ref(Array.from({ length: 20 }).fill(item))
+ 
+const fetchData = async () => {
+  try {
+    const response = await apiUserInfo.get('/api/user/userInfo')
+    tableData.value = response.data
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+onMounted(() => {
+  fetchData()
+})
 
 </script>
 

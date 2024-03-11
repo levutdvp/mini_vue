@@ -9,5 +9,5 @@ export const apiUserInfo = axios.create({
   headers:{
     'Content-Type': 'application/json'
   },
-  baseURL:'https://vite-app-backend-aek2.onrender.com/api/user/userInfo'
+  baseURL:'https://vite-app-backend-aek2.onrender.com'
 })
