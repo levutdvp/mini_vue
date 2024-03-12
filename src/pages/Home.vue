@@ -80,13 +80,13 @@
             <el-container>
               <el-main>
                 <el-scrollbar>
-                  <el-table :data="tableData">
+                  <el-table :data="dataPerPage">
                     <el-table-column prop="id" label="ID" width="100" />
                     <el-table-column prop="username" label="Name" width="120" />
-                    <el-table-column prop="dob" label="Date of birth" width="120"/>
+                    <el-table-column prop="date_of_birth" label="Date of birth" width="120"/>
                     <el-table-column prop="position" label="Position" width="120"/>
-                    <el-table-column prop="phoneNumber" label="Phone number" width="140"/>
-                    <el-table-column prop="creditCard" label="Credit card" width="120"/>
+                    <el-table-column prop="phone_number" label="Phone number" width="140"/>
+                    <el-table-column prop="cc_number" label="Credit card" width="120"/>
                     <el-table-column prop="email" label="email" width="120"/>
                     <el-table-column prop="status" label="status" width="120"/>
                   </el-table>
@@ -103,6 +103,7 @@
           layout="prev, pager, next"
           :total="100"
           class="mt-4 pagination"
+          @current-change="handleCurrentChange"
   />
         <el-footer class="footer">Footer</el-footer>
       </el-container>
@@ -112,15 +113,15 @@
 
 <script lang="ts" setup>
 import { Search} from '@element-plus/icons-vue'
-import { ref, onMounted, onBeforeMount } from 'vue'
+import { ref, onMounted, onBeforeMount, computed } from 'vue'
 import type { ButtonInstance } from 'element-plus'
 import { useRouter } from 'vue-router';
 import { useStore } from 'vuex';
 import { IEmployee, getTable } from '../api/user';
 
-type IEmployeeTable = Omit<IEmployee, "cc_number"> & {
-  cc_number?: string;
-};
+// type IEmployeeTable = Omit<IEmployee, "cc_number"> & {
+//   cc_number?: string;
+// };
 
 
 const dialogFormVisible = ref(false)
@@ -129,9 +130,14 @@ const formLabelWidth = '140px'
 const { state} = useStore()
 const router = useRouter()
 
-const search = ref()
+const search = ref("")
 const tableData = ref<IEmployee[]>([])
-const filterTable = ref<IEmployeeTable[]>([]);
+const filterTable = ref<IEmployee[]>([]);
+
+const currentPage = ref(1);
+const dataPerPage = computed(() => {
+  return filterTable.value.slice((currentPage.value - 1) * 10, currentPage.value * 10);
+});
 
 const checkAccessToken = () => {
   console.log('state', state)
@@ -149,11 +155,16 @@ const handleFilter = () => {
         value.toLowerCase().includes(search.value.toLowerCase())
     )
   );
+  currentPage.value = 1;
 };
 const handleClear = () => {
   search.value = "";
   handleFilter();
 };
+
+const handleCurrentChange = (val: number) => {
+  currentPage.value = val;
+}
 
 
 // const form = reactive({
@@ -174,27 +185,25 @@ const open = ref(false)
  
 const fetchData = async (): Promise<void> => {
   const { data } = await getTable();
-  let newDataTable = tableData.value;
-  if (state.user?.roles.includes("admin")) {
-    newDataTable = data.map((item) => ({
+
+  tableData.value = data.map((item) => {
+    const row = {
       id: item.id,
+      username: item.username,
+      position: item.employment.key_skill,
       date_of_birth: item.date_of_birth,
       phone_number: item.phone_number,
+      email: item.email,
+      status: item.subscription.status,
       cc_number: item.credit_card.cc_number,
-      email: item.email,
-      status: item.subscription.status,
-    }));
-  } else {
-    newDataTable = data.map((item) => ({
-      id: item.id,
-      date_of_birth: item.date_of_birth,
-      phone_number: item.phone_number,
-      email: item.email,
-      status: item.subscription.status,
-    }));
-  }
-  tableData.value = newDataTable;
-  filterTable.value = newDataTable;
+    };
+    // if (state.user?.roles.includes("admin")) {
+    //   row.cc_number = item.credit_card.cc_number;
+    // }
+    return row;
+  });
+
+  filterTable.value = tableData.value;
 };
 
 

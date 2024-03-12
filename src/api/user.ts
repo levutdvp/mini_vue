@@ -66,6 +66,6 @@ export const getUser = () => {
   return api.get<IUser>('user/userInfo')
 }
 export const getTable = (size :number = 100) => {
-  return apiGet.get<ITable[]>(`user/userInfo?size=${size}`)
+  return apiGet.get<ITable[]>(`users/random_user?size=${size}`)
 }
 
