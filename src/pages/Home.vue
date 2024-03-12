@@ -13,7 +13,7 @@
                 Open a Form nested Dialog
               </el-button>
               <el-dialog v-model="dialogFormVisible" title="Shipping address" width="500">
-                <el-form :model="form">
+                <el-form :model="tableData">
                   <el-form-item label="Promotion name" :label-width="formLabelWidth">
                     <el-input v-model="form.name" autocomplete="off" />
                   </el-form-item>
@@ -76,7 +76,7 @@
                 </el-menu>
               </el-scrollbar>
             </el-aside>
-        
+
             <el-container>
               <el-main>
                 <el-scrollbar>
@@ -93,13 +93,15 @@
                 </el-scrollbar>
               </el-main>
             </el-container>
+            <el-button type="primary" :icon="Search">Search</el-button>
+            <el-button type="warning" @click="handleClear">Reset</el-button>
           </el-container>
         </el-main>
         <el-pagination
           small
           background
           layout="prev, pager, next"
-          :total="1000"
+          :total="100"
           class="mt-4 pagination"
   />
         <el-footer class="footer">Footer</el-footer>
@@ -109,43 +111,96 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, reactive, onMounted } from 'vue'
+import { Search} from '@element-plus/icons-vue'
+import { ref, onMounted, onBeforeMount } from 'vue'
 import type { ButtonInstance } from 'element-plus'
-import {apiUserInfo} from '../api/axios-instance'
+import { useRouter } from 'vue-router';
+import { useStore } from 'vuex';
+import { IEmployee, getTable } from '../api/user';
+
+type IEmployeeTable = Omit<IEmployee, "cc_number"> & {
+  cc_number?: string;
+};
 
 
 const dialogFormVisible = ref(false)
 const formLabelWidth = '140px'
 
-const form = reactive({
-  name: '',
-  region: '',
-  date1: '',
-  date2: '',
-  delivery: false,
-  type: [],
-  resource: '',
-  desc: '',
-})
-const btnRef = ref<ButtonInstance>()
+const { state} = useStore()
+const router = useRouter()
 
+const search = ref()
+const tableData = ref<IEmployee[]>([])
+const filterTable = ref<IEmployeeTable[]>([]);
+
+const checkAccessToken = () => {
+  console.log('state', state)
+  if (!state.accessToken) {
+    router.push("login");
+  }
+  console.log(state.accessToken);
+};
+
+const handleFilter = () => {
+  filterTable.value = tableData.value.filter((item) =>
+    Object.values(item).some(
+      (value) =>
+        typeof value === "string" &&
+        value.toLowerCase().includes(search.value.toLowerCase())
+    )
+  );
+};
+const handleClear = () => {
+  search.value = "";
+  handleFilter();
+};
+
+
+// const form = reactive({
+//   name: '',
+//   region: '',
+//   date1: '',
+//   date2: '',
+//   delivery: false,
+//   type: [],
+//   resource: '',
+//   desc: '',
+// })
+
+const btnRef = ref<ButtonInstance>()
 const open = ref(false)
 
-const item = {
-  date: '2016-05-02',
-  name: 'User',
-  address: 'No. 189, Grove St, Los Angeles',
-}
-const tableData = ref(Array.from({ length: 20 }).fill(item))
+
  
-const fetchData = async () => {
-  try {
-    const response = await apiUserInfo.get('/api/user/userInfo')
-    tableData.value = response.data
-  } catch (error) {
-    console.log(error);
+const fetchData = async (): Promise<void> => {
+  const { data } = await getTable();
+  let newDataTable = tableData.value;
+  if (state.user?.roles.includes("admin")) {
+    newDataTable = data.map((item) => ({
+      id: item.id,
+      date_of_birth: item.date_of_birth,
+      phone_number: item.phone_number,
+      cc_number: item.credit_card.cc_number,
+      email: item.email,
+      status: item.subscription.status,
+    }));
+  } else {
+    newDataTable = data.map((item) => ({
+      id: item.id,
+      date_of_birth: item.date_of_birth,
+      phone_number: item.phone_number,
+      email: item.email,
+      status: item.subscription.status,
+    }));
   }
-}
+  tableData.value = newDataTable;
+  filterTable.value = newDataTable;
+};
+
+
+onBeforeMount(() =>{
+  checkAccessToken()
+})
 
 onMounted(() => {
   fetchData()

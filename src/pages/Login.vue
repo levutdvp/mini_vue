@@ -1,47 +1,44 @@
 <template>
-  <el-form :model="loginForm" label-width="80px" class="login-form">
-    <el-form-item label="Username" prop="username">
-      <el-input v-model="loginForm.username" placeholder="Enter your username"></el-input>
+  <el-form @submit="logIn" label-width="80px" class="login-form">
+    <el-form-item label="email" prop="email">
+      <el-input v-model="email" placeholder="Enter your email"></el-input>
     </el-form-item>
-    <el-form-item label="Password" prop="password">
-      <el-input type="password" v-model="loginForm.password" placeholder="Enter your password"></el-input>
+    <el-form-item label="password" prop="password">
+      <el-input type="password" v-model="password" placeholder="Enter your password"></el-input>
     </el-form-item>
     <el-form-item>
-      <el-button type="primary" @click="login">Login</el-button>
+      <el-button type="primary" @click="logIn">Login</el-button>
     </el-form-item>
   </el-form>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue';
+import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
+import { LoginApi } from '../api/authen';
 
-  
-    const loginForm = ref({
-      username: '',
-      password: '',
-    });
-    
-    const router = useRouter()
 
-    const login = () => {
-      const isValidLogin = validateLogin(loginForm.value);
+const store = useStore()
+const router = useRouter()
 
-      if (isValidLogin) {
-        router.push('/');
-      } else {
-        console.log("Unauthorized");
-      }
-    };
+const email = ref('')
+const password = ref('')
 
-    const validateLogin = (loginData:any) => {
-      const validUsername = 'user';
-      const validPassword = 'password';
+const logIn = async(): Promise<void> =>{
+    try {
+      const response = await LoginApi({
+        email: email.value,
+        password: password.value
+      })
 
-      return loginData.username === validUsername && loginData.password === validPassword;
-    };
-  
-
+      const accessToken = response.data.accessToken
+      store.dispatch('setAccessToken', accessToken)
+      router.push('/')      
+    } catch (error) {
+      console.log(error)
+    }
+}
 </script>
 
 <style scoped>

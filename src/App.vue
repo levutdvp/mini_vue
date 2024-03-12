@@ -6,15 +6,7 @@
 </template>
 
 <script>
-import Login from './pages/Login.vue';
-import Home from './pages/Home.vue';
-export default {
-  name: "App",
-  components: {
-      Login,
-      Home
-  }
-};
+
 </script>
 
 <style>
