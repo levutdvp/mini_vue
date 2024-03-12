@@ -5,7 +5,7 @@ import ElementPlus from "element-plus";
 import 'element-plus/dist/index.css'
 import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 import { createRouter, createWebHistory } from 'vue-router';
-import store from './store/auth'
+import store from './store/store'
 import Home from './pages/Home.vue';
 import Login from './pages/Login.vue';
 
