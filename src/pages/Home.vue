@@ -79,6 +79,7 @@
 
             <el-container>
               <el-main>
+                <HomeFilter />
                 <el-scrollbar>
                   <el-table :data="dataPerPage">
                     <el-table-column prop="id" label="ID" width="100" />
@@ -118,6 +119,7 @@ import type { ButtonInstance } from 'element-plus'
 import { useRouter } from 'vue-router';
 import { useStore } from 'vuex';
 import { IEmployee, getTable } from '../api/user';
+import HomeFilter from '../components/home/Filter.vue';
 
 // type IEmployeeTable = Omit<IEmployee, "cc_number"> & {
 //   cc_number?: string;
