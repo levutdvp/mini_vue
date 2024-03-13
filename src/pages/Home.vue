@@ -3,35 +3,7 @@
       <el-container>
         <el-header class="header">Header
             <el-icon ref="btnRef" class="role"  ><Avatar @click="open = true"/></el-icon>      
-          <el-tour v-model="open">
-            <el-tour-step
-              title="Edit"
-              description="Displayed in the center of screen." />
-              <el-button plain @click="dialogFormVisible = true">
-                Open a Form nested Dialog
-              </el-button>
-              <el-dialog v-model="dialogFormVisible" title="Shipping address" width="500">
-                <el-form :model="tableData">
-                  <el-form-item label="Promotion name" :label-width="formLabelWidth">
-                    <el-input v-model="form.name" autocomplete="off" />
-                  </el-form-item>
-                  <el-form-item label="Zones" :label-width="formLabelWidth">
-                    <el-select v-model="form.region" placeholder="Please select a zone">
-                      <el-option label="Zone No.1" value="shanghai" />
-                      <el-option label="Zone No.2" value="beijing" />
-                    </el-select>
-                  </el-form-item>
-                </el-form>
-                <template #footer>
-                  <div class="dialog-footer">
-                    <el-button @click="dialogFormVisible = false">Cancel</el-button>
-                    <el-button type="primary" @click="dialogFormVisible = false">
-                      Confirm
-                    </el-button>
-                  </div>
-                </template>
-              </el-dialog>
-          </el-tour>
+            <EditUserModal @onClose="handleCloseEditDialog" v-model:isShow="open" :width="formLabelWidth" />
         </el-header>
         <el-main class="main">
           <el-container class="layout-container-demo" style="height: 500px">
@@ -116,12 +88,12 @@ import { useRouter } from 'vue-router';
 import { useStore } from 'vuex';
 import { IEmployee, getTable } from '../api/user';
 import HomeFilter from '../components/home/Filter.vue';
+import EditUserModal from '../components/EditUserModal.vue';
 
 // type IEmployeeTable = Omit<IEmployee, "cc_number"> & {
 //   cc_number?: string;
 // };
 
-const dialogFormVisible = ref(false)
 const formLabelWidth = '140px'
 
 const { state} = useStore()
@@ -151,8 +123,6 @@ const handleCurrentChange = (val: number) => {
 const btnRef = ref<ButtonInstance>()
 const open = ref(false)
 
-
-
 const fetchData = async (): Promise<void> => {
   const { data } = await getTable();
   
@@ -175,6 +145,10 @@ const fetchData = async (): Promise<void> => {
 
   filterTable.value = tableData.value;
 };
+
+const handleCloseEditDialog = (value: boolean) => {
+  open.value = value;  
+}
 
 const handleSearchFromChild = (formFilter: {keyword: string}) => {
   console.log('formFilter', formFilter)

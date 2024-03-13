@@ -1,5 +1,6 @@
 import { createStore} from 'vuex';
 import { IUser } from '../api/user';
+import { getUser } from '../api/user';
 
 
 type UserState = {
@@ -40,6 +41,22 @@ const store = createStore<UserState>({
     logOut({ commit } : { commit: Function}) {
       commit('logOut');
     },
+    async pushUserInfo({ commit } : { commit: Function}) {
+      const { data } = await getUser();
+
+      const user = {
+        username: data.username,
+        _id: data._id,
+        email: data.email,
+        phoneNumber: data.phoneNumber,
+        roles: data.roles,
+        password: data.password,
+        dateOfBirth: data.dateOfBirth,
+        gender: data.gender,
+      }
+
+      commit("setUserInfo", user);
+    }
   },
 });
 

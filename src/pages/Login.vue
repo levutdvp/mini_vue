@@ -34,7 +34,8 @@ const logIn = async(): Promise<void> =>{
 
       const accessToken = response.data.accessToken
       store.dispatch('setAccessToken', accessToken)
-      router.push('/')      
+      router.push('/')   
+      store.dispatch("pushUserInfo")   
     } catch (error) {
       console.log(error)
     }
