@@ -2,13 +2,15 @@
   <el-row>
     <el-col :span="20">
       <el-form label-width="auto">
-        <el-form-item class="form-item" label="Keyword">
-          <el-input />
+        <el-form-item class="form-item" label="Keyword" prop="keyword">
+          <el-input v-model="search" @input="validateKeyword" />
+          <span class="danger" v-if="!isKeywordValid"
+            >Keyword is required and cannot contain special characters.</span
+          >
         </el-form-item>
-
         <el-form-item class="form-item" label="Username">
           <el-col :span="9">
-            <el-input />
+            <el-input v-model="username" />
           </el-col>
           <el-col :span="2"> </el-col>
           <el-col :span="13">
@@ -17,6 +19,7 @@
                 type="date"
                 placeholder="Pick a date"
                 style="width: 100%"
+                v-model="dateOfBirth"
               />
             </el-form-item>
           </el-col>
@@ -50,52 +53,39 @@
 
         <el-form-item class="form-item" label="Credit card">
           <el-col :span="9">
-            <el-input />
+            <el-input v-model="creditCard" />
           </el-col>
         </el-form-item>
       </el-form>
     </el-col>
     <el-col :span="4">
       <div class="mb-2">
-        <el-button type="primary" :icon="Search">Search</el-button>
+        <el-button type="primary" :icon="Search" @click="handleSearch"
+          >Search</el-button
+        >
       </div>
       <div>
-        <el-button type="warning">Reset</el-button>
+        <el-button type="warning" @click="search = ''">Reset</el-button>
       </div>
     </el-col>
   </el-row>
 </template>
 <script lang="ts" setup>
-import { ref } from "vue";
-import { Search} from '@element-plus/icons-vue'
+import { reactive, ref } from "vue";
+import { Search } from "@element-plus/icons-vue";
+import { IEmployee } from "../../api/user";
+import { TOption } from "../../types/common";
 
-const positionOptions = ref([
-  {
-    value: "Option1",
-    label: "Option1",
-  },
-  {
-    value: "Option2",
-    label: "Option2",
-  },
-  {
-    value: "Option3",
-    label: "Option3",
-  },
-  {
-    value: "Option4",
-    label: "Option4",
-  },
-  {
-    value: "Option5",
-    label: "Option5",
-  },
-  {
-    value: "Option6",
-    label: "Option6",
-  },
-]);
-const statusOptions = ref([
+interface positionOptions {
+  value: string;
+  label: string;
+}
+
+const username = ref("");
+const dateOfBirth = ref(null);
+const creditCard = ref("");
+const positionOptions = ref<positionOptions[]>([]);
+const statusOptions = ref<TOption[]>([
   {
     value: "Blocked",
     label: "Blocked",
@@ -109,9 +99,53 @@ const statusOptions = ref([
     label: "Pending",
   },
 ]);
+
+// const emit = defineEmits(['validateKeyword'])
+
+const emit = defineEmits(["onSearch"]);
+
+const isKeywordValid = ref(true);
+const search = ref('')
+const validateKeyword = () => {
+  const regex = /^[a-zA-Z0-9_]+$/;
+  isKeywordValid.value = search.value !== "" && regex.test(search.value);
+};
+
+
+const formSearch = reactive({
+  keyword: '',
+  username: '',
+  date_of_birth: '',
+  position: [],
+  phone_number: '',
+  cc_number: '',
+  email: '',
+  status: []
+});
+const tableData = ref<IEmployee[]>([]);
+
+const handleSearch = () => {
+  if(!isKeywordValid.value) return
+  
+  // const searchTerm = search.value.toLowerCase();
+  // filterTable.value = tableData.value.filter(
+  //   (item: IEmployee) =>
+  //     item.phone_number.toLowerCase().includes(searchTerm) ||
+  //     item.email.toLowerCase().includes(searchTerm)
+  // );
+
+  emit("onSearch", formSearch);
+};
+
+
+
+console.log(tableData);
 </script>
 <style scoped>
 .mb-2 {
   margin-bottom: 0.5rem !important;
+}
+.danger {
+  color: red;
 }
 </style>
