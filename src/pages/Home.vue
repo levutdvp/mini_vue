@@ -1,10 +1,8 @@
 <template>
-  
     <div class="common-layout">
       <el-container>
         <el-header class="header">Header
-            <el-icon ref="btnRef" class="role"  ><Avatar @click="open = true"/></el-icon>Admin      
-            
+            <el-icon ref="btnRef" class="role"  ><Avatar @click="open = true"/></el-icon>      
           <el-tour v-model="open">
             <el-tour-step
               title="Edit"
@@ -79,7 +77,7 @@
 
             <el-container>
               <el-main>
-                <HomeFilter />
+                <HomeFilter @onSearch="handleSearchFromChild"/>
                 <el-scrollbar>
                   <el-table :data="dataPerPage">
                     <el-table-column prop="id" label="ID" width="100" />
@@ -94,8 +92,14 @@
                 </el-scrollbar>
               </el-main>
             </el-container>
-            <el-button type="primary" :icon="Search">Search</el-button>
-            <el-button type="warning" @click="handleClear">Reset</el-button>
+            <!-- <el-col :span="4">
+              <div class="mb-2">
+                <el-button type="primary" :icon="Search" >Search</el-button>
+              </div>
+              <div>
+                <el-button type="warning" @click="handleClear">Reset</el-button>
+              </div>
+            </el-col> -->
           </el-container>
         </el-main>
         <el-pagination
@@ -113,8 +117,7 @@
 </template>
 
 <script lang="ts" setup>
-import { Search} from '@element-plus/icons-vue'
-import { ref, onMounted, onBeforeMount, computed } from 'vue'
+import { ref, onMounted, onBeforeMount } from 'vue'
 import type { ButtonInstance } from 'element-plus'
 import { useRouter } from 'vue-router';
 import { useStore } from 'vuex';
@@ -132,14 +135,11 @@ const formLabelWidth = '140px'
 const { state} = useStore()
 const router = useRouter()
 
-const search = ref("")
 const tableData = ref<IEmployee[]>([])
 const filterTable = ref<IEmployee[]>([]);
 
 const currentPage = ref(1);
-const dataPerPage = computed(() => {
-  return filterTable.value.slice((currentPage.value - 1) * 10, currentPage.value * 10);
-});
+const dataPerPage = filterTable.value.slice((currentPage.value - 1) * 10, currentPage.value * 10);
 
 const checkAccessToken = () => {
   console.log('state', state)
@@ -149,42 +149,16 @@ const checkAccessToken = () => {
   console.log(state.accessToken);
 };
 
-const handleFilter = () => {
-  filterTable.value = tableData.value.filter((item) =>
-    Object.values(item).some(
-      (value) =>
-        typeof value === "string" &&
-        value.toLowerCase().includes(search.value.toLowerCase())
-    )
-  );
-  currentPage.value = 1;
-};
-const handleClear = () => {
-  search.value = "";
-  handleFilter();
-};
-
 const handleCurrentChange = (val: number) => {
   currentPage.value = val;
 }
 
 
-// const form = reactive({
-//   name: '',
-//   region: '',
-//   date1: '',
-//   date2: '',
-//   delivery: false,
-//   type: [],
-//   resource: '',
-//   desc: '',
-// })
-
 const btnRef = ref<ButtonInstance>()
 const open = ref(false)
 
 
- 
+
 const fetchData = async (): Promise<void> => {
   const { data } = await getTable();
 
@@ -208,6 +182,13 @@ const fetchData = async (): Promise<void> => {
   filterTable.value = tableData.value;
 };
 
+const handleSearchFromChild = (formFilter: {keyword: string}) => {
+  console.log('formFilter', formFilter)
+  filterTable.value = tableData.value.filter((item: IEmployee) =>
+    item.phone_number.toLowerCase().includes(formFilter.keyword) ||
+    item.email.toLowerCase().includes(formFilter.keyword)
+  );
+};
 
 onBeforeMount(() =>{
   checkAccessToken()
@@ -234,6 +215,9 @@ onMounted(() => {
 .pagination{
   justify-content: center;
   margin-bottom: 20px;
+}
+.mb-2 {
+  margin-bottom: 0.5rem !important;
 }
 .layout-container-demo .el-header {
   position: relative;
