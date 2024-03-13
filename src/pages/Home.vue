@@ -92,14 +92,7 @@
                 </el-scrollbar>
               </el-main>
             </el-container>
-            <!-- <el-col :span="4">
-              <div class="mb-2">
-                <el-button type="primary" :icon="Search" >Search</el-button>
-              </div>
-              <div>
-                <el-button type="warning" @click="handleClear">Reset</el-button>
-              </div>
-            </el-col> -->
+            
           </el-container>
         </el-main>
         <el-pagination
@@ -117,7 +110,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, onMounted, onBeforeMount } from 'vue'
+import { ref, onMounted, onBeforeMount, computed } from 'vue'
 import type { ButtonInstance } from 'element-plus'
 import { useRouter } from 'vue-router';
 import { useStore } from 'vuex';
@@ -127,7 +120,6 @@ import HomeFilter from '../components/home/Filter.vue';
 // type IEmployeeTable = Omit<IEmployee, "cc_number"> & {
 //   cc_number?: string;
 // };
-
 
 const dialogFormVisible = ref(false)
 const formLabelWidth = '140px'
@@ -139,7 +131,9 @@ const tableData = ref<IEmployee[]>([])
 const filterTable = ref<IEmployee[]>([]);
 
 const currentPage = ref(1);
-const dataPerPage = filterTable.value.slice((currentPage.value - 1) * 10, currentPage.value * 10);
+const dataPerPage = computed(() => {
+  return filterTable.value.slice((currentPage.value - 1) * 10, currentPage.value * 10);
+});
 
 const checkAccessToken = () => {
   console.log('state', state)
@@ -161,7 +155,7 @@ const open = ref(false)
 
 const fetchData = async (): Promise<void> => {
   const { data } = await getTable();
-
+  
   tableData.value = data.map((item) => {
     const row = {
       id: item.id,
