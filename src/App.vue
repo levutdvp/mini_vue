@@ -5,8 +5,13 @@
   </div>
 </template>
 
-<script>
+<script setup lang="ts">
+import { onBeforeMount } from "vue";
+import store from "./store/store";
 
+onBeforeMount(() => {
+  store.dispatch("pushUserInfo");
+});
 </script>
 
 <style>

@@ -1,10 +1,11 @@
 import api from "./api"
 import apiGet from "./apiGet";
 export type IUser = {
+  _id: string;
   username: string;
   email?: string;
   phoneNumber?: string;
-  roles: string[];
+  roles: IRole[];
   password: string;
   dateOfBirth?: Date;
   gender: string;
@@ -42,6 +43,21 @@ interface Subscription {
   term: string;
 }
 
+interface RoleList {
+  roleList: IRole[];
+}
+
+interface IUpdateUser {
+  username: string;
+  roles?: string[];
+}
+
+export interface IRole {
+  _id: string;
+  name: string;
+  description: string;
+}
+
 export interface ITable {
   id: number;
   uid: string;
@@ -64,6 +80,12 @@ export interface ITable {
 export type IEmployee = Pick<ITable, "id" | "date_of_birth" | "phone_number"  | "email" > & Pick<CreditCard, "cc_number"> & Pick<Subscription,"status">
 export const getUser = () => {
   return api.get<IUser>('user/userInfo')
+}
+export const updateUser = (id: string, data: IUpdateUser) => {
+  return api.put('user/' + id, data)
+}
+export const getRoles = () => {
+  return api.get<RoleList>('role')
 }
 export const getTable = (size :number = 100) => {
   return apiGet.get<ITable[]>(`users/random_user?size=${size}`)
