@@ -73,7 +73,6 @@
 <script lang="ts" setup>
 import { reactive, ref } from "vue";
 import { Search } from "@element-plus/icons-vue";
-import { IEmployee } from "../../api/user";
 import { TOption } from "../../types/common";
 
 interface positionOptions {
@@ -100,7 +99,6 @@ const statusOptions = ref<TOption[]>([
   },
 ]);
 
-// const emit = defineEmits(['validateKeyword'])
 
 const emit = defineEmits(["onSearch"]);
 
@@ -122,24 +120,17 @@ const formSearch = reactive({
   email: '',
   status: []
 });
-const tableData = ref<IEmployee[]>([]);
 
 const handleSearch = () => {
   if(!isKeywordValid.value) return
-  
-  // const searchTerm = search.value.toLowerCase();
-  // filterTable.value = tableData.value.filter(
-  //   (item: IEmployee) =>
-  //     item.phone_number.toLowerCase().includes(searchTerm) ||
-  //     item.email.toLowerCase().includes(searchTerm)
-  // );
-
+  formSearch.keyword = search.value
+  formSearch.username = search.value
+  formSearch.phone_number = search.value
   emit("onSearch", formSearch);
 };
 
 
 
-console.log(tableData);
 </script>
 <style scoped>
 .mb-2 {
