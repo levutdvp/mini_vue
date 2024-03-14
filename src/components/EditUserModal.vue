@@ -30,7 +30,7 @@
 </template>
 <script lang="ts" setup>
 import { ref, defineProps, onUpdated } from "vue";
-import { getRoles, IRole, IUser, updateUser, getUser } from "../api/user";
+import { getRoles, IRole, updateUser } from "../api/user";
 import store from "../store/store";
 import { ElNotification } from "element-plus";
 
@@ -66,6 +66,8 @@ const fetchRoles = async () => {
   });
 };
 
+const emit: Function = defineEmits(['roleUpdated'])
+
 const handleUpdateUser = async () => {
   if (store.state.user != null) {
     const formData = {
@@ -87,6 +89,7 @@ const handleUpdateUser = async () => {
     isShow.value = false;
 
     store.dispatch("pushUserInfo");
+    emit('roleUpdated', formData.username)
   }
 };
 

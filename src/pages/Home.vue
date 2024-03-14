@@ -2,8 +2,8 @@
     <div class="common-layout">
       <el-container>
         <el-header class="header">Header
-            <el-icon ref="btnRef" class="role"  ><Avatar @click="open = true"/></el-icon>      
-            <EditUserModal @onClose="handleCloseEditDialog" v-model:isShow="open" :width="formLabelWidth" />
+            <el-icon ref="btnRef" class="role"  ><Avatar @click="open = true"/>{{userRole}}</el-icon>      
+            <EditUserModal @onClose="handleCloseEditDialog" v-model:isShow="open" :width="formLabelWidth" @roleUpdated="handleRoleUpdated"/>
         </el-header>
         <el-main class="main">
           <el-container class="layout-container-demo" style="height: 500px">
@@ -90,12 +90,10 @@ import { IEmployee, getTable } from '../api/user';
 import HomeFilter from '../components/home/Filter.vue';
 import EditUserModal from '../components/EditUserModal.vue';
 
-// type IEmployeeTable = Omit<IEmployee, "cc_number"> & {
-//   cc_number?: string;
-// };
 
 const formLabelWidth = '140px'
 
+const store = useStore()
 const { state} = useStore()
 const router = useRouter()
 
@@ -137,9 +135,7 @@ const fetchData = async (): Promise<void> => {
       status: item.subscription.status,
       cc_number: item.credit_card.cc_number,
     };
-    // if (state.user?.roles.includes("admin")) {
-    //   row.cc_number = item.credit_card.cc_number;
-    // }
+   
     return row;
   });
 
@@ -157,6 +153,20 @@ const handleSearchFromChild = (formFilter: {keyword: string}) => {
     item.email.toLowerCase().includes(formFilter.keyword)
   );
 };
+
+const userRole = computed(()=>{
+  const userInfo = store.getters.getUserInfo;
+  return userInfo ? userInfo.username : [];
+});
+const btnRole = ref(null);
+
+
+const handleRoleUpdated = ()  => {
+  if (btnRole.value) {
+    btnRole.value.innerText = userRole.value; 
+  }
+}
+
 
 onBeforeMount(() =>{
   checkAccessToken()
