@@ -12,7 +12,7 @@
           multiple
         >
           <el-option
-            v-for="item in roleOptions"
+            v-for="item in props.roles"
             :key="item._id"
             :label="item.name"
             :value="item._id"
@@ -30,7 +30,7 @@
 </template>
 <script lang="ts" setup>
 import { ref, defineProps, onUpdated } from "vue";
-import { getRoles, IRole, updateUser } from "../api/user";
+import { IRole, updateUser } from "../api/user";
 import store from "../store/store";
 import { ElNotification } from "element-plus";
 
@@ -38,14 +38,11 @@ const isShow = defineModel<boolean>("isShow", { required: true });
 
 const isChangeRole = ref(false);
 
-const props = defineProps({
-  width: {
-    type: String,
-    default: "140px",
-  },
-});
+const props = defineProps<{
+  width: String;
+  roles: IRole[];
+}>();
 
-const roleOptions = ref<IRole[]>([]);
 const form = ref<{
   username: string;
   roles: string[];
@@ -53,18 +50,6 @@ const form = ref<{
   username: "",
   roles: [],
 });
-
-const fetchRoles = async () => {
-  const { data } = await getRoles();
-
-  roleOptions.value = data.roleList.map((item): IRole => {
-    return {
-      name: item.name,
-      description: item.description,
-      _id: item._id,
-    };
-  });
-};
 
 const emit: Function = defineEmits(['roleUpdated'])
 
@@ -95,7 +80,6 @@ const handleUpdateUser = async () => {
 
 onUpdated(() => {
   if (isShow.value) {
-    fetchRoles();
     if (store.state.user != null && form.value != undefined) {
       form.value.username = store.state.user.username;
       form.value.roles = store.state.user.roles.map((item) => item._id);
