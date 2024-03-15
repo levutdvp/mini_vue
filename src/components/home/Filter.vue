@@ -105,8 +105,8 @@ const emit = defineEmits(["onSearch"]);
 const isKeywordValid = ref(true);
 const search = ref('')
 const validateKeyword = () => {
-  const regex = /^[a-zA-Z0-9_]+$/;
-  isKeywordValid.value = search.value !== "" && regex.test(search.value);
+  const regex = /^[a-zA-Z0-9_ ]*$/;
+  isKeywordValid.value =regex.test(search.value.trim());
 };
 
 

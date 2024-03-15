@@ -71,7 +71,7 @@
           small
           background
           layout="prev, pager, next"
-          :total="100"
+          :total="totalPages"
           class="mt-4 pagination"
           @current-change="handleCurrentChange"
   />
@@ -100,9 +100,17 @@ const router = useRouter()
 const tableData = ref<IEmployee[]>([])
 const filterTable = ref<IEmployee[]>([]);
 
+
+const itemsPerPage = 10;
+
+const totalPages = computed(() => {
+  return filterTable.value.length});
+
 const currentPage = ref(1);
 const dataPerPage = computed(() => {
-  return filterTable.value.slice((currentPage.value - 1) * 10, currentPage.value * 10);
+  const startIndex = (currentPage.value - 1) * itemsPerPage;
+  const endIndex = currentPage.value * itemsPerPage;
+  return filterTable.value.slice(startIndex, endIndex);
 });
 
 const checkAccessToken = () => {
