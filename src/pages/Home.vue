@@ -61,7 +61,7 @@
 
           <el-container>
             <el-main>
-              <HomeFilter @onSearch="handleSearchFromChild" />
+              <HomeFilter @onSearch="handleSearchFromChild" :is-display-c-c="isAdmin"/>
               <el-scrollbar>
                 <el-table :data="dataPerPage">
                   <el-table-column prop="id" label="ID" width="100" />
@@ -85,6 +85,7 @@
                     prop="cc_number"
                     label="Credit card"
                     width="120"
+                    v-if="isAdmin"
                   />
                   <el-table-column prop="email" label="email" width="120" />
                   <el-table-column prop="status" label="status" width="120" />
@@ -115,7 +116,7 @@ import { useStore } from "vuex";
 import { IEmployee, getTable, IRole, getRoles } from "../api/user";
 import HomeFilter from "../components/home/Filter.vue";
 import EditUserModal from "../components/EditUserModal.vue";
-
+import store2 from "../store/store";
 const formLabelWidth = "140px";
 
 const store = useStore();
@@ -191,18 +192,20 @@ const handleCloseEditDialog = (value: boolean) => {
   open.value = value;
 };
 
-const handleSearchFromChild = (formFilter: { keyword: string; status: string[]; position: string[]; cc_number: string }) => {
-  console.log(formFilter, filterTable.value);
+const handleSearchFromChild = (formFilter: {keyword: string; username: string,  status: string[]; position: string[]; cc_number: string }) => {
   
   filterTable.value = tableData.value.filter((item: IEmployee) => {
     const searchKeyWord = item.phone_number.toLowerCase().includes(formFilter.keyword) || 
       item.email.toLowerCase().includes(formFilter.keyword);
 
+    
+    const searchUserName = item.username.toLowerCase().includes(formFilter.username)
     const searchStatus = formFilter.status.length == 0 || formFilter.status.join('|').includes(item.status);
     const searchPosition = formFilter.position.length == 0 || formFilter.position.join('|').includes(item.key_skill);
     const searchCreditCard = item.cc_number.toLowerCase().includes(formFilter.cc_number);
-
-    return searchKeyWord && searchStatus && searchPosition && searchCreditCard;
+    
+    return searchKeyWord && searchUserName && searchStatus && searchPosition && searchCreditCard;
+    
   });
 };
 
@@ -218,13 +221,23 @@ const handleRoleUpdated = () => {
   }
 };
 
+//check display col cc_number
+// const isAdmin = ref(false)
+
+const isAdmin = computed(() => {
+  console.log(isAdmin);
+  
+  return store2.state.isAdmin  
+})
+
+
 onBeforeMount(() => {
   checkAccessToken();
   fetchRoles();
 });
 
 onMounted(() => {
-  fetchData();
+  fetchData();  
 });
 </script>
 

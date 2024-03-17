@@ -77,7 +77,7 @@ export interface ITable {
   subscription: Subscription;
 }
 
-export type IEmployee = Pick<ITable, "id" | "date_of_birth" | "phone_number"  | "email" > & Pick<CreditCard, "cc_number"> & Pick<Subscription,"status"> & Pick<Employment,"key_skill">
+export type IEmployee = Pick<ITable, "id" | "username" | "date_of_birth" | "phone_number"  | "email" > & Pick<CreditCard, "cc_number"> & Pick<Subscription,"status"> & Pick<Employment,"key_skill">
 export const getUser = () => {
   return api.get<IUser>('user/userInfo')
 }

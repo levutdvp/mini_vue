@@ -83,14 +83,8 @@ onUpdated(() => {
     if (store.state.user != null && form.value != undefined) {
       form.value.username = store.state.user.username;
       form.value.roles = store.state.user.roles.map((item) => item._id);
-
-      const roleString = store.state.user.roles
-        .map((item) => item.name)
-        .join(";");
-
-      if (roleString.includes("admin")) {
-        isChangeRole.value = true;
-      }
+      
+      isChangeRole.value = store.state.isAdmin
     }
   } else {
     form.value.username = "";

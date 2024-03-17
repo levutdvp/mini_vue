@@ -51,7 +51,7 @@
           </el-col>
         </el-form-item>
 
-        <el-form-item class="form-item" label="Credit card">
+        <el-form-item class="form-item" label="Credit card" v-show="props.isDisplayCC">
           <el-col :span="9">
             <el-input v-model="creditCard" />
           </el-col>
@@ -67,6 +67,7 @@
       <div>
         <el-button type="warning" @click="handleSearch(true)">Reset</el-button>
       </div>
+      <el-button type="warning" class="logout" plain @click="handleLogOut">Log out</el-button>
     </el-col>
   </el-row>
 </template>
@@ -74,6 +75,7 @@
 import { reactive, ref } from "vue";
 import { Search } from "@element-plus/icons-vue";
 import { TOption } from "../../types/common";
+import { useStore } from "vuex";
 
 interface positionOptions {
   value: string;
@@ -169,7 +171,7 @@ const handleSearch = (isReset: boolean = false) => {
   if (!isReset) {
     if(!isKeywordValid.value) return
     formSearch.keyword = search.value
-    formSearch.username = search.value
+    formSearch.username = username.value
     formSearch.phone_number = search.value 
     formSearch.status = status.value 
     formSearch.position = position.value 
@@ -201,6 +203,18 @@ const resetForm = () => {
   isKeywordValid.value = true;
 };
 
+const store = useStore()
+
+const handleLogOut = () =>{
+  store.dispatch('logOut');
+}
+
+// check display input cc_number
+
+const props = defineProps<{
+  isDisplayCC: boolean
+}>()
+
 </script>
 <style scoped>
 .mb-2 {
@@ -208,5 +222,8 @@ const resetForm = () => {
 }
 .danger {
   color: red;
+}
+.logout{
+  margin-top: 10px;
 }
 </style>

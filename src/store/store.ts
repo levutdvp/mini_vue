@@ -6,20 +6,29 @@ import { getUser } from '../api/user';
 type UserState = {
   user: IUser | null;
   accessToken: string | null;
+  isAdmin: boolean;
 }
+
+
 
 const store = createStore<UserState>({
   state: {
     user: null,
     accessToken: localStorage.getItem('accessToken'),
+    isAdmin: false
   } as UserState,
   getters: {
     getUserInfo: (state: UserState) => state.user,
+    getIsAdmin : (state: UserState) => state.isAdmin
   },
   mutations: {
     setUserInfo(state: UserState, user: IUser) {
       state.user = user;
       console.log(user);
+      const roleString = state.user.roles
+        .map((item) => item.name)
+        .join(";");
+      state.isAdmin = roleString.includes("admin") ? true : false
     },
     setAccessToken(state: UserState, token: string) {
       state.accessToken = token;
